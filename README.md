@@ -2,8 +2,8 @@
 
 This repository contains two n8n workflows that together implement a **Retrieval-Augmented Generation (RAG)** system based on the **Model Context Protocol (MCP)** architecture:
 
-* ✅ **MCP Server** (Active – Handles ingestion + retrieval)
-* ⏸️ **MCP Client** (Inactive – Handles chat + AI orchestration)
+* ✅ **MCP Server** (Handles ingestion + retrieval)
+* ✅ **MCP Client** (Handles chat + AI orchestration)
 
 The system enables:
 
