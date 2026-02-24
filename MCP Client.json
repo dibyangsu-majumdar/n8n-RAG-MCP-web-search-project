@@ -1,0 +1,184 @@
+{
+  "name": "MCP Client",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "29aae3ec-a127-4eca-ad68-47638bb9ac08",
+      "name": "When chat message received",
+      "webhookId": "05f7868f-1ff0-4bd9-92ad-ab9ae29fda4a"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are a helpful assistant with access to specialized tools.\n\nYou have access to:\n1. **MCP RAG Database** - Use this for questions specifically about MCP (Model Context Protocol) concepts, documentation, and technical details\n2. **Web Search** - Use this for current information, recent developments, news, or any topic requiring real-time data\n\nWhen answering questions:\n- For MCP-specific questions, use the MCP RAG database first\n- For questions about recent MCP updates, news, or current developments, use the web search tool\n- For general questions requiring current information, use the web search tool\n- Always cite your sources when using tools"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        352,
+        0
+      ],
+      "id": "d7f91709-3729-4537-be4c-28c0fd195e64",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-120b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        224,
+        224
+      ],
+      "id": "be4bb65c-03f9-4b1d-bfe9-5c317b7cc21d",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "5Jf5SF5PxRKmj9IQ",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 15
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        352,
+        224
+      ],
+      "id": "6a6b7598-aa3b-4f51-b6cf-72bc2cd9b158",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "endpointUrl": "https://dmajumdar.app.n8n.cloud/mcp/d24b5a25-ff28-4ed0-a316-606e36a190b9",
+        "include": "selected",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "typeVersion": 1.2,
+      "position": [
+        480,
+        224
+      ],
+      "id": "2a92eddd-578e-4e95-a2eb-8ed501965434",
+      "name": "MCP Client"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Search the web for current information, news, recent developments, or any topic requiring real-time data. Use this for questions about recent events, current MCP updates, or general web searches.",
+        "method": "POST",
+        "url": "https://api.tavily.com/search",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"api_key\": \"{{ $vars.Tavily_Api_Key }}\",\n  \"query\": \"={{ $fromAI('search_query', 'The search query or question to look up', 'string') }}\",\n  \"search_depth\": \"basic\",\n  \"include_answer\": true,\n  \"max_results\": 5\n}",
+        "options": {},
+        "optimizeResponse": true,
+        "fieldsToInclude": "selected",
+        "fields": "answer,results"
+      },
+      "id": "2f040acf-af22-4bce-ace3-1056bf063441",
+      "name": "Tavily Search Tool",
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.4,
+      "position": [
+        608,
+        224
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MCP Client": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tavily Search Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "bdd27a7c-0032-4713-81ae-22cd4ab5aa34",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a88b4b7d9295e862068f00b406503ec226c125add14985401a00ed283e319d39"
+  },
+  "id": "V4UcvQSef6xAbzyA",
+  "tags": []
+}
